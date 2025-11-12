@@ -1,20 +1,87 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import LoginScreen from './screens/Login';
+import MainHome from './screens/MainScreen';
+import SignUpScreen from './screens/SignUpScreen';
+import AddStudent from './screens/AddStudentScreen';
+import AddStudentDetails from './screens/AddStudentDetails';
+import ViewDataScreen from './screens/ViewData';
+import Profile from './screens/Profile';
 
-export default function App() {
+const Stack = createStackNavigator();
+
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator
+      initialRouteName="MainHome"
+      >
+          <Stack.Screen
+          name="MainHome"
+          component={MainHome}
+          options={{ headerShown: false }}
+        /> 
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="SignUp" 
+          component={SignUpScreen} 
+          options={{ headerShown: false }}
+        /> 
+        <Stack.Screen 
+          name="AddStudent" 
+          component={AddStudent} 
+          
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="AddStudentDetails" 
+          component={AddStudentDetails} 
+          
+          options={{
+            title: 'AddStudentDetails',
+            headerStyle: {
+              backgroundColor: '#008080',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
+        <Stack.Screen 
+          name="ViewData" 
+          component={ViewDataScreen} 
+          
+           options={{
+            title: 'View Data',
+            headerStyle: {
+              backgroundColor: '#008080',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{
+            title: 'Profile',
+            headerStyle: {
+              backgroundColor: '#008080',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
