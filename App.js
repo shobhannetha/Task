@@ -72,7 +72,7 @@ const App = () => {
           options={{
             title: 'Profile',
             headerStyle: {
-              backgroundColor: '#008080',
+              backgroundColor: '#07585B',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
