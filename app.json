@@ -4,7 +4,7 @@
     "slug": "Task",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/StudentApp.png",
+    "icon": "./assets/studentApp1.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/StudentApp.png",
+        "foregroundImage": "./assets/studentApp1.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
