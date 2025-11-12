@@ -108,7 +108,7 @@ const AddStudent = ({ navigation }) => {
         {/* Map View Card */}
         <TouchableOpacity
           style={[styles.card, styles.mapViewCard]}
-          onPress={() => navigation.navigate('MapView')}
+          
         >
           <View style={[styles.cardIcon, { backgroundColor: COLORS.ocean }]}>
             <Image

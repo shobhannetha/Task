@@ -43,7 +43,7 @@ const App = () => {
           component={AddStudentDetails} 
           
           options={{
-            title: 'AddStudentDetails',
+            title: 'Add Student Details',
             headerStyle: {
               backgroundColor: '#008080',
             },
