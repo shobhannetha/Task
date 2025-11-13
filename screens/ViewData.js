@@ -1,26 +1,58 @@
-import React from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Dimensions } from 'react-native';
+import { studentId } from './modal';
 const { width, height } = Dimensions.get('window');
 
-const students = [
-  { id: '1', name: 'Micahel', grade: '6th Std - A', school: 'K.G School', image: require('../assets/Group 1379.png') },
-  { id: '2', name: 'Amitha', grade: '6th Std - A', school: 'K.G School', image: require('../assets/Group 1379.png') },
-  { id: '3', name: 'Arul', grade: '6th Std - A', school: 'K.G School', image: require('../assets/Group 1379.png') },
-  { id: '4', name: 'Shankar', grade: '6th Std - A', school: 'K.G School', image: require('../assets/Group 1379.png') },
-  { id: '5', name: 'Sarath', grade: '6th Std - A', school: 'K.G School', image: require('../assets/Group 1379.png') },
-  { id: '6', name: 'Jai', grade: '6th Std - A', school: 'K.G School', image: require('../assets/Group 1379.png') },
-];
 
-const ViewDataScreen = () => {
+
+
+
+
+const ViewDataScreen = ({ navigation }) => {
+  const [isloading, setIsLoading] = useState(false);
+  const [students, setStudents] = useState([])
+// const navigation=useNavigation()
+  const response = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch("http://localhost:5000/getstudents/getstudent");
+      const data = await res.json();
+      setStudents(data);
+      console.log('dataa', data)
+      console.log('shobhan', students)
+
+    } catch (err) {
+      console.error("Error fetching students:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    response();
+  }, []);
+  const handleNext=(item)=>{
+    studentId.studentid=item.student_id;
+    navigation.navigate('profile')
+  }
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <Image source={item.image} resizeMode="contain" style={styles.avatar} />
+      <Image
+        source={{ uri: `http://localhost:5000${item.profile_image_url}` }}
+        style={styles.avatar}
+        resizeMode="contain"
+      />
+      
       <View style={styles.info}>
         <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.details}>{item.grade} / {item.school}</Text>
+        <Text style={styles.details}>{item.section} / {item.school_name}</Text>
       </View>
-      <TouchableOpacity style={styles.arrowButton}>
+      <TouchableOpacity style={styles.arrowButton} onPress={() => {
+   
+    navigation.navigate('Profile', { studentId: item.student_id }); 
+  }}>
+    {console.log('datta',studentId)}
         <Image
           source={require('../assets/trajectory.png')}
           style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}
@@ -32,13 +64,17 @@ const ViewDataScreen = () => {
 
   return (
     <View style={styles.container}>
+      {isloading ? (
+        <ActivityIndicator  style={{justifyContent:'center',alignItems:'center',position:'static',}}/>
+      ) : (
 
-      <FlatList
-        data={students}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-      />
+        <FlatList
+          data={students}
+          keyExtractor={(item, index) => `${item.name}-${index}`}
+          renderItem={renderItem}
+          contentContainerStyle={styles.list}
+        />
+      )}
     </View>
   );
 };

@@ -20,10 +20,16 @@
         "foregroundImage": "./assets/studentApp1.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.moulikashobhan.Task"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "802eb6d8-4aab-4f7d-825d-6953dd26e964"
+      }
     }
   }
 }

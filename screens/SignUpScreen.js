@@ -9,7 +9,9 @@ import {
     Dimensions,
     ScrollView,
     StatusBar,
+    ActivityIndicator,
 } from "react-native";
+import { signup } from "./modal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,12 +22,72 @@ const SignUpScreen = ({ navigation }) => {
         password: "",
         confirmPassword: "",
     });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const validateForm = () => {
+        const { username, phone, password, confirmPassword } = form;
+        if (!username.trim()) {
+            setError("Username is required");
+            return false;
+        }
+        if (!phone.trim()) {
+            setError("Phone number is required");
+            return false;
+        }
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return false;
+        }
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return false;
+        }
+        return true;
+    };
+
+   const handleSave = async () => {
+  if (!validateForm()) return;
+
+  setLoading(true);
+
+  // assigning form data to signup object
+  signup.username = form.username;
+  signup.phone_no = form.phone;
+  signup.password = form.password;
+
+  try {
+    
+    const response = await fetch(`http://localhost:5000/api/signup/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(signup), 
+    });
+
+    const data = await response.json(); 
+    setLoading(false);
+
+    if (response.ok) {
+          navigation.navigate("AddStudent");
+    } else {
+        setError(data.message || "Signup failed. Please try again.");
+    }
+  } catch (error) {
+    setLoading(false);
+    console.error("Error:", error);
+    setError("An error occurred. Please try again.");
+  }
+};
+
+
 
     return (
         <View style={styles.container}>
-             <View style={{ backgroundColor: "#07575B", height: StatusBar.currentHeight }}>
-                           <StatusBar barStyle="dark-content" backgroundColor="#07575B" />
-                       </View>  
+            <View style={{ backgroundColor: "#07575B", height: StatusBar.currentHeight }}>
+                <StatusBar barStyle="dark-content" backgroundColor="#07575B" />
+            </View>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 
                 {/* Top Illustration Section */}
@@ -79,24 +141,30 @@ const SignUpScreen = ({ navigation }) => {
                         value={form.confirmPassword}
                         onChangeText={(t) => setForm({ ...form, confirmPassword: t })}
                     />
-
+                    {error ? <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text> : null}
                     {/* Sign Up Button */}
-                    <TouchableOpacity style={styles.signUpButton}>
-                        <Text style={styles.signUpText}>SIGN UP</Text>
+
+                    {console.log(form)}
+                    <TouchableOpacity style={styles.signUpButton} onPress={() => { handleSave() }}>
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.signUpText}>SIGN UP</Text>
+                        )}
                     </TouchableOpacity>
 
-                   
+
                 </View>
-                 {/* Sign In Link */}
-                    <Text style={styles.footerText}>
-                        Already have an account?{" "}
-                        <Text
-                            style={styles.signInLink}
-                            onPress={() => navigation.navigate("Login")}
-                        >
-                            Signin
-                        </Text>
+                {/* Sign In Link */}
+                <Text style={styles.footerText}>
+                    Already have an account?{" "}
+                    <Text
+                        style={styles.signInLink}
+                        onPress={() => navigation.navigate("Login")}
+                    >
+                        Signin
                     </Text>
+                </Text>
             </ScrollView>
         </View>
     );
@@ -108,8 +176,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#FFFF",
-       height: height,
-    width: width,
+        height: height,
+        width: width,
     },
     topSection: {
         alignItems: "center",

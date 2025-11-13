@@ -10,9 +10,11 @@ import {
   ScrollView,
   StatusBar,
   Dimensions,
-  Image
+  Image,
+  ActivityIndicator
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { login } from './modal';
 const { height, width } = Dimensions.get('window');
 
 const COLORS = {
@@ -27,10 +29,48 @@ const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    console.log('Login attempted:', { username, password });
-    navigation.navigate('AddStudent');
+
+  const handleLogin = async () => {
+     if (!validateForm()) return;
+    setLoading(true);
+    login.username = username;
+    login.password = password;
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/Login/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(login),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (!response.ok) {
+        setError(data.error || data.message || 'Login failed. Please try again.');
+
+      } else {
+        navigation.navigate('AddStudent');
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Login Error:', error);
+      setError('Network error. Please try again later.');
+    }
+  }
+  const validateForm = () => {
+    if (!username.trim()) {
+      setError('Username is required');
+      return false;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -101,10 +141,15 @@ const LoginScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.forgotPassword}>
               <Text style={styles.forgotPasswordText}>Forgot Password ?</Text>
             </TouchableOpacity>
-
+            {error ? <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text> : null}
             {/* Login Button */}
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+
               <Text style={styles.loginButtonText}>LOG IN</Text>
+              )}
             </TouchableOpacity>
 
             {/* Sign Up Link */}

@@ -31,12 +31,12 @@ const App = () => {
           name="SignUp" 
           component={SignUpScreen} 
           options={{ headerShown: false }}
-        /> 
+        />
         <Stack.Screen 
           name="AddStudent" 
           component={AddStudent} 
           
-          options={{ headerShown: false }}
+          options={{ headerShown: false }} 
         />
         <Stack.Screen 
           name="AddStudentDetails" 
