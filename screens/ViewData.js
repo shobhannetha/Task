@@ -12,11 +12,11 @@ const { width, height } = Dimensions.get('window');
 const ViewDataScreen = ({ navigation }) => {
   const [isloading, setIsLoading] = useState(false);
   const [students, setStudents] = useState([])
-// const navigation=useNavigation()
+
   const response = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:5000/getstudents/getstudent");
+      const res = await fetch("https://https-githubcom-shobhannetha-taskbackend-production-8aed.up.railway.app/getstudents/getstudent");
       const data = await res.json();
       setStudents(data);
       console.log('dataa', data)
@@ -39,11 +39,11 @@ const ViewDataScreen = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image
-        source={{ uri: `http://localhost:5000${item.profile_image_url}` }}
+        source={{ uri: `https://https-githubcom-shobhannetha-taskbackend-production-8aed.up.railway.app/${item.profile_image_url}` }}
         style={styles.avatar}
         resizeMode="contain"
       />
-      
+      {console.log('imge',item.profile_image_url)}
       <View style={styles.info}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.details}>{item.section} / {item.school_name}</Text>

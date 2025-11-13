@@ -46,40 +46,40 @@ const SignUpScreen = ({ navigation }) => {
         return true;
     };
 
-   const handleSave = async () => {
-  if (!validateForm()) return;
+    const handleSave = async () => {
+        if (!validateForm()) return;
 
-  setLoading(true);
+        setLoading(true);
 
-  // assigning form data to signup object
-  signup.username = form.username;
-  signup.phone_no = form.phone;
-  signup.password = form.password;
+        // assigning form data to signup object
+        signup.username = form.username;
+        signup.phone_no = form.phone;
+        signup.password = form.password;
 
-  try {
-    
-    const response = await fetch(`http://localhost:5000/api/signup/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(signup), 
-    });
+        try {
 
-    const data = await response.json(); 
-    setLoading(false);
+            const response = await fetch(`https://https-githubcom-shobhannetha-taskbackend-production-8aed.up.railway.app/api/signup/signup`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(signup),
+            });
 
-    if (response.ok) {
-          navigation.navigate("AddStudent");
-    } else {
-        setError(data.message || "Signup failed. Please try again.");
-    }
-  } catch (error) {
-    setLoading(false);
-    console.error("Error:", error);
-    setError("An error occurred. Please try again.");
-  }
-};
+            const data = await response.json();
+            setLoading(false);
+
+            if (response.ok) {
+                navigation.navigate("AddStudent");
+            } else {
+                setError(data.error || "Signup failed. Please try again.");
+            }
+        } catch (error) {
+            setLoading(false);
+            console.error("Error:", error);
+            setError("An error occurred. Please try again.");
+        }
+    };
 
 
 
@@ -107,6 +107,7 @@ const SignUpScreen = ({ navigation }) => {
                     <TextInput
                         style={styles.input}
                         placeholder="User Name"
+                        maxLength={30}
                         placeholderTextColor="#777"
                         value={form.username}
                         onChangeText={(t) => setForm({ ...form, username: t })}
@@ -117,16 +118,26 @@ const SignUpScreen = ({ navigation }) => {
                         style={styles.input}
                         placeholder="Phone no"
                         placeholderTextColor="#777"
+                        maxLength={10}
                         keyboardType="phone-pad"
                         value={form.phone}
-                        onChangeText={(t) => setForm({ ...form, phone: t })}
+                        onChangeText={(t) => {
+                            // Allow only digits
+                            const cleaned = t.replace(/[^0-9]/g, '');
+                            // Validate first digit: only allow if starts with 6-9
+                            if (cleaned === '' || /^[6-9]/.test(cleaned)) {
+                                setForm({ ...form, phone: cleaned });
+                            }
+                        }}
                     />
+
 
                     {/* Password */}
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
                         placeholderTextColor="#777"
+                        maxLength={30}
                         secureTextEntry
                         value={form.password}
                         onChangeText={(t) => setForm({ ...form, password: t })}
@@ -137,6 +148,7 @@ const SignUpScreen = ({ navigation }) => {
                         style={styles.input}
                         placeholder="Confirm Password"
                         placeholderTextColor="#777"
+                        maxLength={30}
                         secureTextEntry
                         value={form.confirmPassword}
                         onChangeText={(t) => setForm({ ...form, confirmPassword: t })}

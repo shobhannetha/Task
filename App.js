@@ -8,6 +8,8 @@ import AddStudent from './screens/AddStudentScreen';
 import AddStudentDetails from './screens/AddStudentDetails';
 import ViewDataScreen from './screens/ViewData';
 import Profile from './screens/Profile';
+import LocationPicker from './screens/LocationPicker';
+import MapViewScreen from './screens/MapView';
 
 const Stack = createStackNavigator();
 
@@ -37,7 +39,7 @@ const App = () => {
           component={AddStudent} 
           
           options={{ headerShown: false }} 
-        />
+        /> 
         <Stack.Screen 
           name="AddStudentDetails" 
           component={AddStudentDetails} 
@@ -79,6 +81,33 @@ const App = () => {
               fontWeight: 'bold',
             },
           }} />
+           <Stack.Screen
+          name="LocationPicker"
+          component={LocationPicker}
+          options={{
+            title: 'Add Location',
+            headerStyle: {
+              backgroundColor: '#07585B',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
+           <Stack.Screen
+          name="MapView"
+          component={MapViewScreen}
+          options={{
+            title: 'Map View',
+            headerStyle: {
+              backgroundColor: '#07585B',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

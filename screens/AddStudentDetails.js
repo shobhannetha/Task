@@ -9,14 +9,15 @@ import {
   TouchableRipple,
   RadioButton
 } from 'react-native-paper';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { Dimensions } from 'react-native';
 import { studentDetails } from './modal';
 const { width, height } = Dimensions.get('window');
-const AddStudentDetails = () => {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const AddStudentDetails = ({ navigation, route }) => {
   const [bloodGroup, setBloodGroup] = useState('');
   const [name, setName] = useState('');
   const [studentClass, setStudentClass] = useState('');
@@ -38,14 +39,14 @@ const AddStudentDetails = () => {
   const showDatePicker = () => setDatePickerVisibility(true);
   const hideDatePicker = () => setDatePickerVisibility(false);
   const handleConfirm = (date) => {
-    const formatted = date.toLocaleDateString('en-GB'); // DD/MM/YYYY
+    const formatted = date.toLocaleDateString('en-GB');
     setDob(formatted);
     hideDatePicker();
   };
+  const [selectedCoordinates, setSelectedCoordinates] = useState(null)
   const [errorMessage, setErrorMessage] = useState('');
   const [isloading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  // Dropdowns
   const [classVisible, setClassVisible] = useState(false);
   const [sectionVisible, setSectionVisible] = useState(false);
   const [bloodGroupVisible, setBloodGroupVisible] = useState(false);
@@ -56,25 +57,112 @@ const AddStudentDetails = () => {
 
 
 
-  // Add this useEffect to debug your form state
+  // Load form data when component mounts
   React.useEffect(() => {
-    console.log('=== CURRENT FORM STATE ===');
-    console.log('Name:', name);
-    console.log('Class:', studentClass);
-    console.log('Section:', section);
-    console.log('Blood Group:', bloodGroup);
-    console.log('Gender:', gender);
-    console.log('DOB:', dob);
-    console.log('School Name:', schoolName);
-    console.log('Father Name:', fatherName);
-    console.log('Mother Name:', motherName);
-    console.log('Parent Contact:', parentContact);
-    console.log('Address:', address1);
-    console.log('City:', city);
-    console.log('State:', state);
-    console.log('ZIP:', zip);
-    console.log('Emergency Contact:', emergencyContactNumber);
-  }, [name, studentClass, section, bloodGroup, gender, dob, schoolName, fatherName, motherName, parentContact, address1, city, state, zip, emergencyContactNumber]);
+    loadFormData();
+  }, []);
+
+const loadFormData = async () => {
+  try {
+    const savedData = await AsyncStorage.getItem('tempFormData');
+    if (savedData) {
+      const formData = JSON.parse(savedData);
+      
+      // Only restore fields if we're NOT coming from LocationPicker
+      // Check if we have fresh location data from navigation
+      if (!route.params?.selectedLocation) {
+        setName(formData.name || '');
+        setStudentClass(formData.studentClass || '');
+        setSection(formData.section || '');
+        setSchoolName(formData.schoolName || '');
+        setFatherName(formData.fatherName || '');
+        setMotherName(formData.motherName || '');
+        setParentContact(formData.parentContact || '');
+        setAddress1(formData.address1 || '');
+        setCity(formData.city || '');
+        setState(formData.state || '');
+        setZip(formData.zip || '');
+        setEmergencyContactNumber(formData.emergencyContactNumber || '');
+        setGender(formData.gender || '');
+        setDob(formData.dob || '');
+        setBloodGroup(formData.bloodGroup || '');
+        setStudentImage(formData.studentImage || null);
+        setAddLocation(formData.addLocation || '');
+      } else {
+        // We have fresh location data, only restore other fields
+        setName(formData.name || '');
+        setStudentClass(formData.studentClass || '');
+        setSection(formData.section || '');
+        setSchoolName(formData.schoolName || '');
+        setFatherName(formData.fatherName || '');
+        setMotherName(formData.motherName || '');
+        setParentContact(formData.parentContact || '');
+        setAddress1(formData.address1 || '');
+        setCity(formData.city || '');
+        setState(formData.state || '');
+        setZip(formData.zip || '');
+        setEmergencyContactNumber(formData.emergencyContactNumber || '');
+        setGender(formData.gender || '');
+        setDob(formData.dob || '');
+        setBloodGroup(formData.bloodGroup || '');
+        setStudentImage(formData.studentImage || null);
+        // DON'T set addLocation here - let the location useEffect handle it
+      }
+
+      // Clear the temporary storage
+      await AsyncStorage.removeItem('tempFormData');
+    }
+  } catch (error) {
+    console.error('Error loading form data:', error);
+  }
+};
+
+
+  const handleLocationPress = async () => {
+    try {
+      const formData = {
+        name,
+        studentClass,
+        section,
+        schoolName,
+        fatherName,
+        motherName,
+        parentContact,
+        address1,
+        city,
+        state,
+        zip,
+        emergencyContactNumber,
+        gender,
+        dob,
+        bloodGroup,
+        studentImage,
+        addLocation,
+      };
+
+      // ✅ Save the current form before navigation
+      await AsyncStorage.setItem('tempFormData', JSON.stringify(formData));
+
+      // ✅ Navigate AFTER data is saved
+      navigation.navigate('LocationPicker');
+    } catch (error) {
+      console.error('Error saving form data:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (route.params?.selectedLocation) {
+      const { address, latitude, longitude } = route.params.selectedLocation;
+      setAddLocation(address);
+      setSelectedCoordinates({ latitude, longitude });
+      console.log('Received location:', { address, latitude, longitude });
+    }
+  }, [route.params?.selectedLocation]);
+
+  React.useEffect(() => {
+
+
+  }, [name, studentClass, section, bloodGroup, gender, dob, schoolName, fatherName, motherName, parentContact, address1, city, state, zip, emergencyContactNumber, addLocation]);
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
@@ -83,8 +171,6 @@ const AddStudentDetails = () => {
       setIsLoading(true);
 
       const formData = new FormData();
-
-      // Append all text fields with actual values
       formData.append('name', name || '');
       formData.append('class', studentClass || '');
       formData.append('section', section || '');
@@ -99,25 +185,31 @@ const AddStudentDetails = () => {
       formData.append('emergency_contact', emergencyContactNumber || '');
       formData.append('gender', gender || '');
       formData.append('school_name', schoolName || '');
+      formData.append('AddAddress', addLocation || '');
+      if (selectedCoordinates) {
+        formData.append('location_lat', selectedCoordinates.latitude.toString());
+        formData.append('location_lng', selectedCoordinates.longitude.toString());
+        console.log('Adding coordinates to formData:', selectedCoordinates);
+      } else {
+        console.log('No coordinates available');
+      }
 
-      // FIXED: Proper web image handling
+      // ✅ Handle image upload for both web and mobile
       if (studentImage) {
-        console.log('Processing image for web:', studentImage);
+        console.log('Processing image:', studentImage);
 
-        if (studentImage.startsWith('blob:')) {
+        if (typeof window !== 'undefined' && studentImage.startsWith('blob:')) {
+          // Web (browser) case
           try {
-            // Convert blob URI to actual File object for web
             const response = await fetch(studentImage);
             const blob = await response.blob();
 
-            // Create a proper File object (this is key for web)
             const file = new File([blob], `student_${Date.now()}.jpg`, {
-              type: 'image/jpeg'
+              type: 'image/jpeg',
             });
 
-            // Append the File object directly (not as an object)
             formData.append('studentImage', file);
-            console.log('Successfully created File object:', file);
+            console.log('Successfully created File object (web):', file);
           } catch (blobError) {
             console.error('Error converting blob:', blobError);
             alert('Error processing image. Please try again.');
@@ -125,8 +217,16 @@ const AddStudentDetails = () => {
             return;
           }
         } else {
-          // For non-blob URIs (shouldn't happen in web)
-          formData.append('studentImage', studentImage);
+          // React Native (mobile) case
+          const imageName = studentImage.split('/').pop() || `student_${Date.now()}.jpg`;
+
+          formData.append('studentImage', {
+            uri: studentImage,
+            name: imageName,
+            type: 'image/jpeg',
+          });
+
+          console.log('Successfully appended image object (mobile)');
         }
       }
 
@@ -136,27 +236,39 @@ const AddStudentDetails = () => {
         console.log(pair[0] + ':', pair[1]);
       }
 
-      const response = await fetch(`http://localhost:5000/api/students/add`, {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch(
+        `https://https-githubcom-shobhannetha-taskbackend-production-8aed.up.railway.app/api/students/add`, // ✅ use correct Railway domain
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
 
-      const data = await response.json();
-      setIsLoading(false);
+      const responseText = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(responseText); // try to parse JSON
+      } catch (err) {
+        console.error("Response is not JSON:", responseText.substring(0, 200));
+        throw new Error("Server returned an error page. Check backend logs.");
+      }
 
       if (response.ok) {
         setShowSuccessModal(true);
-        console.log('Server Response:', data);
+        console.log("Server Response:", data);
       } else {
-        console.log('Server Error Response:', data);
-        alert(data.error || data.message || 'Error adding student');
+        console.log("Server Error Response:", data);
+        alert(data.error || data.message || `Error: ${response.status}`);
       }
+
     } catch (error) {
       console.error('Error submitting student:', error);
       alert('Something went wrong: ' + error.message);
       setIsLoading(false);
     }
   };
+
 
 
 
@@ -193,13 +305,8 @@ const AddStudentDetails = () => {
         const selectedImage = result.assets[0].uri;
 
         console.log('Selected image URI (web):', selectedImage);
-
-        // In web, blob URIs are NORMAL and EXPECTED
-        // Don't reject them - they work fine with FormData
         setStudentImage(selectedImage);
         setErrorMessage('');
-
-        // Show success message
         console.log('Image selected successfully');
       }
     } catch (error) {
@@ -218,7 +325,7 @@ const AddStudentDetails = () => {
             <Image source={{ uri: studentImage }} style={styles.uploadedImage} />
 
           ) : (
-            <> {console.log('daaaa', studentImage)}
+            <>
               <Image source={require('../assets/Group 1379.png')} style={styles.icon} />
               <Image
                 source={require('../assets/interface (6).png')}
@@ -232,28 +339,19 @@ const AddStudentDetails = () => {
             </>
           )}
         </TouchableOpacity>
-        <Button
-          mode="contained"
-          onPress={handleSubmit}
-          style={styles.button}
-        >
-          {isloading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            "Submit"
-          )}
-        </Button>
-        {errorMessage ? <Text style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</Text> : null}
+
+
         <TextInput
           label="Student Name"
           value={name}
+          maxLength={30}
           onChangeText={setName}
           mode="outlined"
           style={styles.input}
           theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
         />
 
-        {/* Class & Section */}
+
         <View style={styles.rowContainer}>
           <View style={styles.dropdownHalf}>
             <Menu
@@ -330,6 +428,7 @@ const AddStudentDetails = () => {
         <TextInput
           label="School Name"
           value={schoolName}
+          maxLength={50}
           onChangeText={setSchoolName}
           mode="outlined"
           style={styles.input}
@@ -337,7 +436,7 @@ const AddStudentDetails = () => {
         />
 
 
-        {/* <View style={styles.genderDobRow}> */}
+
 
         <View style={styles.genderContainer}>
           <Text style={styles.genderLabel}>Gender :</Text>
@@ -361,7 +460,7 @@ const AddStudentDetails = () => {
               <Text style={styles.radioText}>Female</Text>
             </View>
           </View>
-          {/* </View> */}
+
 
 
 
@@ -428,6 +527,7 @@ const AddStudentDetails = () => {
         <TextInput
           label="Father's Name"
           value={fatherName}
+          maxLength={30}
           onChangeText={setFatherName}
           mode="outlined"
           style={styles.input}
@@ -436,6 +536,7 @@ const AddStudentDetails = () => {
         <TextInput
           label="Mother's Name"
           value={motherName}
+          maxLength={30}
           onChangeText={setMotherName}
           mode="outlined"
           style={styles.input}
@@ -446,6 +547,7 @@ const AddStudentDetails = () => {
           value={parentContact}
           onChangeText={setParentContact}
           mode="outlined"
+          maxLength={10}
           keyboardType="phone-pad"
           style={styles.input}
           theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
@@ -453,6 +555,7 @@ const AddStudentDetails = () => {
         <TextInput
           label="Address 1"
           value={address1}
+          maxLength={50}
           onChangeText={setAddress1}
           mode="outlined"
           style={styles.input}
@@ -463,6 +566,7 @@ const AddStudentDetails = () => {
           value={city}
           onChangeText={setCity}
           mode="outlined"
+          maxLength={50}
           style={styles.input}
           theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
         />
@@ -471,6 +575,7 @@ const AddStudentDetails = () => {
           value={state}
           onChangeText={setState}
           mode="outlined"
+          maxLength={30}
           style={styles.input}
           theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
         />
@@ -479,6 +584,7 @@ const AddStudentDetails = () => {
           value={zip}
           onChangeText={setZip}
           mode="outlined"
+          maxLength={6}
           keyboardType="numeric"
           style={styles.input}
           theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
@@ -488,18 +594,61 @@ const AddStudentDetails = () => {
           value={emergencyContactNumber}
           onChangeText={setEmergencyContactNumber}
           mode="outlined"
+          maxLength={10}
           keyboardType="phone-pad"
           style={styles.input}
           theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
         />
-        <TextInput
-          label="Additional Location Info"
-          value={addLocation}
-          onChangeText={setAddLocation}
-          mode="outlined"
-          style={styles.input}
-          theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
-        />
+        <TouchableOpacity onPress={handleLocationPress} activeOpacity={0.8}>
+          <TextInput
+            key={`location-${addLocation}`}
+            label="Add Location"
+            value={addLocation || ''}
+            editable={false}
+            mode="outlined"
+            style={styles.input}
+            theme={{ colors: { primary: '#07575B', outline: '#07575B' } }}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <Image
+                    source={require('../assets/Group 1437.png')}
+                    style={styles.locationIcon}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            right={
+              !addLocation ? (
+                <TextInput.Icon
+                  icon={() => (
+                    <Text style={styles.clickHereText}>Click here to add the location</Text>
+                  )}
+                />
+              ) : null
+            } 
+          />
+        </TouchableOpacity>
+
+
+        {errorMessage ? <Text style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</Text> : null}
+       <Button
+  mode="contained"
+  onPress={handleSubmit}
+  style={[styles.button, isloading && styles.buttonDisabled]}
+  disabled={isloading}
+  contentStyle={styles.buttonContent}
+>
+  {isloading ? (
+    <View style={styles.buttonLoader}>
+      <ActivityIndicator size="small" color="#fff" />
+      <Text style={styles.buttonLoaderText}>Submitting...</Text>
+    </View>
+  ) : (
+    "Submit"
+  )}
+</Button>
 
         <Modal
           transparent={true}
@@ -547,9 +696,9 @@ const styles = StyleSheet.create({
 
   },
   button: {
-    // marginTop: 18,
+    marginTop: 18,
     backgroundColor: '#07575B',
-    // marginBottom: '25%',
+    marginBottom: '25%',
   },
   rowContainer: {
     flexDirection: 'row',
@@ -562,7 +711,6 @@ const styles = StyleSheet.create({
   genderDobRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    // alignItems: 'flex-start',
     marginBottom: 16,
   },
   genderContainer: {
@@ -652,7 +800,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#28a745",
+    color: "#07575B",
     marginBottom: 10,
   },
   modalMessage: {
@@ -662,7 +810,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   okButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#07575B",
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 25,
@@ -672,6 +820,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+  locationIcon: {
+    width: 40,
+    height: 35,
+    tintColor: '#07575B',
+  },
+  clickHereText: {
+    fontSize: 12,
+    color: '#999',
+    fontStyle: 'italic',
+  },
+  
 
 
 });

@@ -34,13 +34,13 @@ const LoginScreen = ({ navigation }) => {
 
 
   const handleLogin = async () => {
-     if (!validateForm()) return;
+    if (!validateForm()) return;
     setLoading(true);
     login.username = username;
     login.password = password;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/Login/login`, {
+      const response = await fetch(`https://https-githubcom-shobhannetha-taskbackend-production-8aed.up.railway.app/api/Login/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(login),
@@ -106,6 +106,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 placeholder="User Name"
+                maxLength={30}
                 placeholderTextColor="#777"
                 value={username}
                 onChangeText={setUsername}
@@ -119,7 +120,7 @@ const LoginScreen = ({ navigation }) => {
                 placeholder="Password"
                 placeholderTextColor="#777"
                 value={password}
-
+                maxLength={30}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
                 style={styles.input}
@@ -141,14 +142,14 @@ const LoginScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.forgotPassword}>
               <Text style={styles.forgotPasswordText}>Forgot Password ?</Text>
             </TouchableOpacity>
-            {error ? <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text> : null}
+            {error ? <Text style={{ color: 'red', top: -15 }}>{error}</Text> : null}
             {/* Login Button */}
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
 
-              <Text style={styles.loginButtonText}>LOG IN</Text>
+                <Text style={styles.loginButtonText}>LOG IN</Text>
               )}
             </TouchableOpacity>
 
