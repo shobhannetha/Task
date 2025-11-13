@@ -62,60 +62,60 @@ const AddStudentDetails = ({ navigation, route }) => {
     loadFormData();
   }, []);
 
-const loadFormData = async () => {
-  try {
-    const savedData = await AsyncStorage.getItem('tempFormData');
-    if (savedData) {
-      const formData = JSON.parse(savedData);
-      
-      // Only restore fields if we're NOT coming from LocationPicker
-      // Check if we have fresh location data from navigation
-      if (!route.params?.selectedLocation) {
-        setName(formData.name || '');
-        setStudentClass(formData.studentClass || '');
-        setSection(formData.section || '');
-        setSchoolName(formData.schoolName || '');
-        setFatherName(formData.fatherName || '');
-        setMotherName(formData.motherName || '');
-        setParentContact(formData.parentContact || '');
-        setAddress1(formData.address1 || '');
-        setCity(formData.city || '');
-        setState(formData.state || '');
-        setZip(formData.zip || '');
-        setEmergencyContactNumber(formData.emergencyContactNumber || '');
-        setGender(formData.gender || '');
-        setDob(formData.dob || '');
-        setBloodGroup(formData.bloodGroup || '');
-        setStudentImage(formData.studentImage || null);
-        setAddLocation(formData.addLocation || '');
-      } else {
-        // We have fresh location data, only restore other fields
-        setName(formData.name || '');
-        setStudentClass(formData.studentClass || '');
-        setSection(formData.section || '');
-        setSchoolName(formData.schoolName || '');
-        setFatherName(formData.fatherName || '');
-        setMotherName(formData.motherName || '');
-        setParentContact(formData.parentContact || '');
-        setAddress1(formData.address1 || '');
-        setCity(formData.city || '');
-        setState(formData.state || '');
-        setZip(formData.zip || '');
-        setEmergencyContactNumber(formData.emergencyContactNumber || '');
-        setGender(formData.gender || '');
-        setDob(formData.dob || '');
-        setBloodGroup(formData.bloodGroup || '');
-        setStudentImage(formData.studentImage || null);
-        // DON'T set addLocation here - let the location useEffect handle it
-      }
+  const loadFormData = async () => {
+    try {
+      const savedData = await AsyncStorage.getItem('tempFormData');
+      if (savedData) {
+        const formData = JSON.parse(savedData);
 
-      // Clear the temporary storage
-      await AsyncStorage.removeItem('tempFormData');
+        // Only restore fields if we're NOT coming from LocationPicker
+        // Check if we have fresh location data from navigation
+        if (!route.params?.selectedLocation) {
+          setName(formData.name || '');
+          setStudentClass(formData.studentClass || '');
+          setSection(formData.section || '');
+          setSchoolName(formData.schoolName || '');
+          setFatherName(formData.fatherName || '');
+          setMotherName(formData.motherName || '');
+          setParentContact(formData.parentContact || '');
+          setAddress1(formData.address1 || '');
+          setCity(formData.city || '');
+          setState(formData.state || '');
+          setZip(formData.zip || '');
+          setEmergencyContactNumber(formData.emergencyContactNumber || '');
+          setGender(formData.gender || '');
+          setDob(formData.dob || '');
+          setBloodGroup(formData.bloodGroup || '');
+          setStudentImage(formData.studentImage || null);
+          setAddLocation(formData.addLocation || '');
+        } else {
+          // We have fresh location data, only restore other fields
+          setName(formData.name || '');
+          setStudentClass(formData.studentClass || '');
+          setSection(formData.section || '');
+          setSchoolName(formData.schoolName || '');
+          setFatherName(formData.fatherName || '');
+          setMotherName(formData.motherName || '');
+          setParentContact(formData.parentContact || '');
+          setAddress1(formData.address1 || '');
+          setCity(formData.city || '');
+          setState(formData.state || '');
+          setZip(formData.zip || '');
+          setEmergencyContactNumber(formData.emergencyContactNumber || '');
+          setGender(formData.gender || '');
+          setDob(formData.dob || '');
+          setBloodGroup(formData.bloodGroup || '');
+          setStudentImage(formData.studentImage || null);
+          // DON'T set addLocation here - let the location useEffect handle it
+        }
+
+        // Clear the temporary storage
+        await AsyncStorage.removeItem('tempFormData');
+      }
+    } catch (error) {
+      console.error('Error loading form data:', error);
     }
-  } catch (error) {
-    console.error('Error loading form data:', error);
-  }
-};
+  };
 
 
   const handleLocationPress = async () => {
@@ -155,7 +155,7 @@ const loadFormData = async () => {
       const { address, latitude, longitude } = route.params.selectedLocation;
       setAddLocation(address);
       setSelectedCoordinates({ latitude, longitude });
-      console.log('Received location:', { address, latitude, longitude });
+
     }
   }, [route.params?.selectedLocation]);
 
@@ -189,7 +189,7 @@ const loadFormData = async () => {
       if (selectedCoordinates) {
         formData.append('location_lat', selectedCoordinates.latitude.toString());
         formData.append('location_lng', selectedCoordinates.longitude.toString());
-        console.log('Adding coordinates to formData:', selectedCoordinates);
+
       } else {
         console.log('No coordinates available');
       }
@@ -627,28 +627,28 @@ const loadFormData = async () => {
                   )}
                 />
               ) : null
-            } 
+            }
           />
         </TouchableOpacity>
 
 
         {errorMessage ? <Text style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</Text> : null}
-       <Button
-  mode="contained"
-  onPress={handleSubmit}
-  style={[styles.button, isloading && styles.buttonDisabled]}
-  disabled={isloading}
-  contentStyle={styles.buttonContent}
->
-  {isloading ? (
-    <View style={styles.buttonLoader}>
-      <ActivityIndicator size="small" color="#fff" />
-      <Text style={styles.buttonLoaderText}>Submitting...</Text>
-    </View>
-  ) : (
-    "Submit"
-  )}
-</Button>
+        <Button
+          mode="contained"
+          onPress={handleSubmit}
+          style={[styles.button, isloading && styles.buttonDisabled]}
+          disabled={isloading}
+          contentStyle={styles.buttonContent}
+        >
+          {isloading ? (
+            <View style={styles.buttonLoader}>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.buttonLoaderText}>Submitting...</Text>
+            </View>
+          ) : (
+            "Submit"
+          )}
+        </Button>
 
         <Modal
           transparent={true}
@@ -830,7 +830,7 @@ const styles = StyleSheet.create({
     color: '#999',
     fontStyle: 'italic',
   },
-  
+
 
 
 });

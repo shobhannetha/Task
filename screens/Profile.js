@@ -21,7 +21,7 @@ const Profile = () => {
             console.log('Profile Image Path:', student.profile_image_url);
         }
     }, [student]);
-       const handleImageError = (error) => {
+    const handleImageError = (error) => {
         console.log('Image loading failed:', error.nativeEvent.error);
         setImageError(true);
     };
@@ -68,7 +68,7 @@ const Profile = () => {
 
 
 
- 
+
 
     return (
         <PaperProvider>
@@ -115,8 +115,8 @@ const Profile = () => {
                                     <Text style={[styles.sectionTitle, { fontWeight: 'bold', textAlign: 'center' }]}>DOB</Text>
                                     {/* <Text style={[styles.sectionTitle, { fontSize: 12, textAlign: 'center' }]}>{student?.dob || 'N/A'}</Text> */}
                                     <Text style={[styles.sectionTitle, { fontSize: 12, textAlign: 'center' }]}>
-  {student?.createdDate ? new Date(student.dob).toISOString().split('T')[0] : 'N/A'}
-</Text>
+                                        {student?.createdDate ? new Date(student.dob).toISOString().split('T')[0] : 'N/A'}
+                                    </Text>
                                 </View>
                             </View>
 
@@ -129,30 +129,29 @@ const Profile = () => {
                         </View>
 
                         {/* White Background Container */}
-                        <View style={styles.whiteContainer}>
+                       <View style={styles.whiteContainer}>
+    <View style={[styles.section, styles.borderedSection]}>
+        <Text style={styles.sectionTitle}>Parents Details</Text>
 
-                            <View style={[styles.section, styles.borderedSection]}>
-                                <Text style={styles.sectionTitle}>Parents Details</Text>
+        <View style={styles.twoColumnContainer}>
+            {/* Left Column - Labels */}
+            <View style={styles.leftColumn}>
+                <Text style={styles.bulletLabel}>Father's name</Text>
+                <Text style={styles.bulletLabel}>Mother's name</Text>
+                <Text style={styles.bulletLabel}>Contact no.</Text>
+                <Text style={styles.bulletLabel}>Emergency contact no.</Text>
+            </View>
 
-                                <View style={styles.twoColumnContainer}>
+            {/* Right Column - Values */}
+            <View style={styles.rightColumn}>
+                <Text style={styles.parentValue}>{student?.father_name || 'N/A'}</Text>
+                <Text style={styles.parentValue}>{student?.mother_name || 'N/A'}</Text>
+                <Text style={styles.contactValue}>{student?.parent_contact || 'N/A'}</Text>
+                <Text style={styles.contactValue}>{student?.emergency_contact || 'N/A'}</Text>
+            </View>
+        </View>
+    </View>
 
-                                    <View style={styles.leftColumn}>
-                                        <Text style={styles.bulletLabel}>Father's name</Text>
-                                        <Text style={styles.bulletLabel}>Mother's name</Text>
-                                        <Text style={styles.bulletLabel}>Contact no.</Text>
-                                        <Text style={styles.bulletLabel}>Emergency contact no.</Text>
-                                    </View>
-
-
-                                    <View style={styles.rightColumn}>
-                                        <Text style={styles.parentsNames}>{student?.father_name} {student?.mother_name || 'N/A'}</Text>
-                                        <View style={styles.contactsColumn}>
-                                            <Text style={styles.contactValue}>{student?.parent_contact || 'N/A'}</Text>
-                                            <Text style={styles.contactValue}>{student?.emergency_contact || 'N/A'}</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
 
                             {/* Residential Details Section */}
                             <View style={[styles.section, styles.borderedSection]}>
