@@ -169,7 +169,7 @@ import { Ionicons } from '@expo/vector-icons';
       setMarker({ latitude: result.latitude, longitude: result.longitude });
       setRegion(newRegion);
       
-      // Get the full address for the selected location
+      
       await reverseGeocode(result.latitude, result.longitude);
       
       setSearchQuery('');
@@ -362,14 +362,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   searchIcon: {
     marginRight: 8,
@@ -389,14 +381,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     maxHeight: 200,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   searchResultsList: {
     borderRadius: 12,
@@ -433,14 +417,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   searchLoadingText: {
     marginLeft: 8,

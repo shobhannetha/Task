@@ -16,10 +16,16 @@
       "supportsTablet": true
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB5t-Ou5Xt72yoCiHIy_f3zN5v3OsEANn8"
+        }
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/studentApp1.png",
         "backgroundColor": "#ffffff"
       },
+      
       "edgeToEdgeEnabled": true,
       "package": "com.moulikashobhan.Task"
     },
